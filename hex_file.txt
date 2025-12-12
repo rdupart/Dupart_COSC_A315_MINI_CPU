@@ -1,0 +1,5 @@
+# Sample MIPS instructions in hex format
+0x2008000A
+0x20090001
+0x01095020
+0xAC0A0000
