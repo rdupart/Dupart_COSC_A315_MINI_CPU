@@ -6,9 +6,13 @@ R0-R31
 	R4–R7		= $a0–$a3 (arguments)
 	R2–R3		= $v0–$v1 (return values)
 
+Instruction Formats:
+
 R-Type: | opcode (6) | rs (5) | rt (5) | rd (5) | shamt (5) | funct (6) |
+        |   31-26    | 25-21  | 20-16  | 15-11  |   10-6   |   5-0    |
 
 I-Type: | opcode (6) | rs (5) | rt (5) | immediate (16) |
+        |   31-26    | 25-21  | 20-16  |      15-0      |
 
 | Instruction | Type | Opcode (bin) | Funct (bin) | Description                            
 
@@ -21,6 +25,25 @@ LW          | I    | 100011       | —           | rt = MEM[rs + imm]
 SW          | I    | 101011       | —           | MEM[rs + imm] = rt                     
 BEQ         | I    | 000100       | —           | if (rs == rt) PC = PC + 4 + (imm << 2) |
 
+Encoding Examples (Binary → Hex):
+
+Example 1: ADDI $t0, $zero, 10
+Instruction: ADDI rt, rs, immediate
+Fields: opcode=001000, rs=00000 ($zero), rt=01000 ($t0), imm=0000000000001010 (10)
+Binary: 00100000000010000000000000001010
+Hex: 0x2008000A
+
+Example 2: ADD $t2, $t0, $t1
+Instruction: ADD rd, rs, rt
+Fields: opcode=000000, rs=01000 ($t0), rt=01001 ($t1), rd=01010 ($t2), shamt=00000, funct=100000
+Binary: 00000001000010010101000000100000
+Hex: 0x01095020
+
+Example 3: SW $t2, 0($zero)
+Instruction: SW rt, offset(rs)
+Fields: opcode=101011, rs=00000 ($zero), rt=01010 ($t2), imm=0000000000000000 (0)
+Binary: 10101100000010100000000000000000
+Hex: 0xAC0A0000
 
 
 Technical Report:
