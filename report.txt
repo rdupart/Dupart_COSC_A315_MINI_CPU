@@ -1,0 +1,71 @@
+Instruction Set:
+R0-R31
+	R0 		= $zero   0
+	R8-R15		= $t0-$t7 (temp storage)
+	R16-R23		= $s0–$s7 (saved registers)
+	R4–R7		= $a0–$a3 (arguments)
+	R2–R3		= $v0–$v1 (return values)
+
+R-Type: | opcode (6) | rs (5) | rt (5) | rd (5) | shamt (5) | funct (6) |
+
+I-Type: | opcode (6) | rs (5) | rt (5) | immediate (16) |
+
+| Instruction | Type | Opcode (bin) | Funct (bin) | Description                            
+
+ADD         | R    | 000000       | 100000      | rd = rs + rt                           
+SUB         | R    | 000000       | 100010      | rd = rs – rt                           
+AND         | R    | 000000       | 100100      | rd = rs & rt                           
+OR          | R    | 000000       | 100101      | rd = rs | rt                           
+ADDI        | I    | 001000       | —           | rt = rs + imm                          
+LW          | I    | 100011       | —           | rt = MEM[rs + imm]                     
+SW          | I    | 101011       | —           | MEM[rs + imm] = rt                     
+BEQ         | I    | 000100       | —           | if (rs == rt) PC = PC + 4 + (imm << 2) |
+
+
+
+Technical Report:
+
+Mini CPU Architecture that is similar to MIPs in that it:
+1. Loads machine code into RAM
+2. Executes each cycle
+3. Prints register and PC state
+
+The CPU supports the following: ADD, SUB, ADDI, LW, SW, BEQ
+
+The PC is a 32 bit machine, incrementing by 4unless branch is taken.R0 is always 0. 4KB RAM, and the IR holds the current fetched instruction. The CPU cycle follows 5 steps:
+1. Fetch:
+	IR = Memory[PC]
+	PC = PC + 4
+2. Decode:
+	opcode = (IR >> 26) & 0x3F
+	rs     = (IR >> 21) & 0x1F
+	rt     = (IR >> 16) & 0x1F
+	rd     = (IR >> 11) & 0x1F
+	funct  = IR & 0x3F
+	imm    = IR & 0xFFFF
+3. Execute: ADD, SUB, ADDI
+4. Memory: Used by LW/SW
+5. Write-back: R-type: write rd; I-type: write rt (except BEQ, SW)
+
+BEQ Logic:
+	if (rs == rt)
+     	PC = PC + (imm << 2)
+		else
+     	PC unchanged (except +4 from fetch)
+
+
+Example execution from Program 1: 
+Cycle 1:
+PC = 0x0
+IR = 0x2008000A (ADDI)
+R8 = 10
+
+Cycle 2:
+PC = 0x4
+IR = 0x20090001 (ADDI)
+R9 = 1
+
+Cycle 3:
+PC = 0x8
+IR = 0x01095020 (ADD)
+R10 = 11
